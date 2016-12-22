@@ -1,4 +1,20 @@
 {
-  "name": "application-name",
-  "version": "0.0.1"
+  "name": "poi-plugin-test6",
+  "version": "0.2.4",
+  "main": "index.es",
+  "description": "A plugin for poi tests baka.",
+  "author": {
+    "name": "a26214311",
+    "url": "https://github.com/a26214311"
+  },
+  "poiPlugin": {
+    "title": "baka test",
+    "description": "flan is baka",
+    "icon": "fa/language",
+    "i18nDir": "i18n/translator",
+    "apiVer": {
+      "6.3.3": "2.1.1",
+      "7.0.0-beta.1": "3.0.0"
+    }
+  }
 }
