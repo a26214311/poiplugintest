@@ -55,28 +55,27 @@ function getfleet(){
 }
 
 function getship(shipid){
-  console.log(shipid);
   var obj = getStore("info.ships")[shipid];
   console.log(obj);
   var apishipid = obj.api_ship_id;
   var r = "";
   r = r + getshipinfo(apishipid);
-  r = r + "lv:" + obj.api_lv + "<br />";
-  r = r + obj.api_nowhp + "/" + obj.api_maxhp + "<br />";
-  r = r + "火力：" + obj.api_kaihi[0] + "/" + obj.api_kaihi[1] + "<br />";
-  r = r + "雷装：" + obj.api_karyoku[0] + "/" + obj.api_karyoku[1] + "<br />";
-  r = r + "装甲：" + obj.api_kyouka[0] + "/" + obj.api_kyouka[1] + "<br />";
-  r = r + "幸运：" + obj.api_lucky[0] + "/" + obj.api_lucky[1] + "<br />";
-  r = r + "<br />";
+  r = r + "lv:" + obj.api_lv + "<br>";
+  r = r + "耐久：" + obj.api_nowhp + "/" + obj.api_maxhp + "<br>";
+  r = r + "火力：" + obj.api_kaihi[0] + "/" + obj.api_kaihi[1] + "<br>";
+  r = r + "雷装：" + obj.api_karyoku[0] + "/" + obj.api_karyoku[1] + "<br>";
+  r = r + "装甲：" + obj.api_kyouka[0] + "/" + obj.api_kyouka[1] + "<br>";
+  r = r + "幸运：" + obj.api_lucky[0] + "/" + obj.api_lucky[1] + "<br>";
+  r = r + "<br>";
   return r;
 }
 
 function getshipinfo(shipid){
   var obj = getStore("const.$ships")[shipid];
   var r = "";
-  r = r + obj.api_name + "<br />";
+  r = r + obj.api_name + "<br>";
   r = r + obj.api_getmes;
-  r = r + "<br />";
+  r = r + "<br>";
   return r;
 }
 
@@ -97,7 +96,9 @@ increaseClick,
       <div>
         <h1>flan is baka</h1>
         <h1>{test}</h1>
-        <div>{fleetinfo}</div>
+        <div dangerouslySetInnerHTML={{__html: fleetinfo}}>
+
+        </div>
         <div></div>
       </div>
     )
