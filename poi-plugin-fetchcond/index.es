@@ -105,7 +105,8 @@ function getshipinfo(shipid){
 }
 
 function getAllCondShip(){
-  var allships = getStore("info.ships");
+	try{
+	  var allships = getStore("info.ships");
   var condships = {};
   for (var p in allships){
     var ship = allships[p];
@@ -147,6 +148,11 @@ function getAllCondShip(){
   }
 
   return new Date().toLocaleString() + "<br>" + ret;
+	}catch(e){
+		var ret = "unknown error";
+		return ret;
+	}
+
 }
 
 function getShipTypeAndName(infoshipid){
@@ -159,8 +165,14 @@ function getShipTypeAndName(infoshipid){
 }
 
 function reRend(){
-  var ret = getAllCondShip();
-  document.getElementById("showcond").innerHTML = ret ;
+	try{
+		var ret = getAllCondShip();
+		document.getElementById("showcond").innerHTML = ret ;
+	}catch(e){
+		var ret = "unknown error";
+		document.getElementById("showcond").innerHTML = ret ;
+	}
+
 }
 
 // poi will render this component in the plugin panel
