@@ -60,22 +60,47 @@ function getship(shipid){
   var apishipid = obj.api_ship_id;
   var r = "";
   r = r + getshipinfo(apishipid);
-  r = r + "lv:" + obj.api_lv + "<br>";
+  r = r + "lv:" + obj.api_lv + "   cond:"+obj.api_cond+"<br>";
   r = r + "耐久：" + obj.api_nowhp + "/" + obj.api_maxhp + "<br>";
-  r = r + "火力：" + obj.api_kaihi[0] + "/" + obj.api_kaihi[1] + "<br>";
-  r = r + "雷装：" + obj.api_karyoku[0] + "/" + obj.api_karyoku[1] + "<br>";
-  r = r + "装甲：" + obj.api_kyouka[0] + "/" + obj.api_kyouka[1] + "<br>";
-  r = r + "幸运：" + obj.api_lucky[0] + "/" + obj.api_lucky[1] + "<br>";
-  r = r + "<br>";
-  return r;
+  var lr = "";
+  lr = lr + "火力：" + obj.api_karyoku[0] + "/" + obj.api_karyoku[1] + "<br>";
+  lr = lr + "雷装：" + obj.api_raisou[0] + "/" + obj.api_raisou[1] + "<br>";
+  lr = lr + "装甲：" + obj.api_soukou[0] + "/" + obj.api_soukou[1] + "<br>";
+  lr = lr + "回避：" + obj.api_kaihi[0] + "/" + obj.api_kaihi[1] + "<br>";
+  lr = lr + "对空：" + obj.api_taiku[0] + "/" + obj.api_taiku[1] + "<br>";
+  lr = lr + "幸运：" + obj.api_lucky[0] + "/" + obj.api_lucky[1] + "<br>";
+
+  var itemarr = obj.api_slot;
+  var itemstr = "";
+  for(var i=0;i<itemarr.length;i++){
+    if(itemarr[i]>0){
+      itemstr = itemstr + "<div>" + getitem(itemarr[i]) + "</div>";
+    }else{
+      itemstr = itemstr + "<div>" + " " + "</div>";
+    }
+  }
+  var ret = r + '<table><tr><td>'+lr+'</td><td> </td><td>'+itemstr+'</td></tr></table><br>';
+  return ret;
 }
+
+function getitem(itemid){
+  var obj = getStore("info.equips")[itemid];
+  var apiitemid = obj.api_slotitem_id;
+  var itemlevel = obj.api_level;
+  var iteminfo = getStore("const.$equips")[apiitemid];
+  var itemname = iteminfo.api_name;
+  var ret = itemname;
+  if(itemlevel>0){
+    ret = ret + "★" + itemlevel;
+  }
+  return ret;
+}
+
 
 function getshipinfo(shipid){
   var obj = getStore("const.$ships")[shipid];
   var r = "";
   r = r + obj.api_name + "<br>";
-  r = r + obj.api_getmes;
-  r = r + "<br>";
   return r;
 }
 
