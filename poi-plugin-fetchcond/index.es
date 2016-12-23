@@ -40,73 +40,11 @@ function increaseClick() {
   }
 }
 
-function testship(){
-  return _ships[1].api_slot[0];
-}
 
-function getfleet(){
-  var fleet = getStore("info.fleets")[0];
-  var nships = fleet.api_ship;
-  var r = "";
-  for(var i=0;i<nships.length;i++){
-    r = r + getship(nships[i]);
-  }
-  return r;
-}
-
-function getship(shipid){
-  var obj = getStore("info.ships")[shipid];
-  console.log(obj);
-  var apishipid = obj.api_ship_id;
-  var r = "";
-  r = r + getshipinfo(apishipid);
-  r = r + "lv:" + obj.api_lv + "   cond:"+obj.api_cond+"<br>";
-  r = r + "耐久：" + obj.api_nowhp + "/" + obj.api_maxhp + "<br>";
-  var lr = "";
-  lr = lr + "火力：" + obj.api_karyoku[0] + "/" + obj.api_karyoku[1] + "<br>";
-  lr = lr + "雷装：" + obj.api_raisou[0] + "/" + obj.api_raisou[1] + "<br>";
-  lr = lr + "装甲：" + obj.api_soukou[0] + "/" + obj.api_soukou[1] + "<br>";
-  lr = lr + "回避：" + obj.api_kaihi[0] + "/" + obj.api_kaihi[1] + "<br>";
-  lr = lr + "对空：" + obj.api_taiku[0] + "/" + obj.api_taiku[1] + "<br>";
-  lr = lr + "幸运：" + obj.api_lucky[0] + "/" + obj.api_lucky[1] + "<br>";
-
-  var itemarr = obj.api_slot;
-  var itemstr = "";
-  for(var i=0;i<itemarr.length;i++){
-    if(itemarr[i]>0){
-      itemstr = itemstr + "<div>" + getitem(itemarr[i]) + "</div>";
-    }else{
-      itemstr = itemstr + "<div>" + " " + "</div>";
-    }
-  }
-  var ret = r + '<table><tr><td>'+lr+'</td><td> </td><td>'+itemstr+'</td></tr></table><br>';
-  return ret;
-}
-
-function getitem(itemid){
-  var obj = getStore("info.equips")[itemid];
-  var apiitemid = obj.api_slotitem_id;
-  var itemlevel = obj.api_level;
-  var iteminfo = getStore("const.$equips")[apiitemid];
-  var itemname = iteminfo.api_name;
-  var ret = itemname;
-  if(itemlevel>0){
-    ret = ret + "★" + itemlevel;
-  }
-  return ret;
-}
-
-
-function getshipinfo(shipid){
-  var obj = getStore("const.$ships")[shipid];
-  var r = "";
-  r = r + obj.api_name + "<br>";
-  return r;
-}
 
 function getAllCondShip(){
-	try{
-	  var allships = getStore("info.ships");
+try{
+  var allships = getStore("info.ships");
   var condships = {};
   for (var p in allships){
     var ship = allships[p];
@@ -146,17 +84,18 @@ function getAllCondShip(){
     }
     ret = ret + "<br>";
   }
-
   return new Date().toLocaleString() + "<br>" + ret;
-	}catch(e){
-		var ret = "unknown error";
-		return ret;
-	}
-
+  }
+  catch(e){
+	return "unknown error";
+  }
 }
 
 function getShipTypeAndName(infoshipid){
   var shipinfo = getStore("const.$ships")[infoshipid];
+  if(shipinfo==undefined){
+	return ["error","error"]
+  }
   var shiptype = shipinfo.api_stype;
   var shipname = shipinfo.api_name;
   var shipTypeInfo = getStore("const.$shipTypes")[shiptype];
@@ -165,25 +104,16 @@ function getShipTypeAndName(infoshipid){
 }
 
 function reRend(){
-	try{
-		var ret = getAllCondShip();
-		document.getElementById("showcond").innerHTML = ret ;
-	}catch(e){
-		var ret = "unknown error";
-		document.getElementById("showcond").innerHTML = ret ;
-	}
-
+  var ret = getAllCondShip();
+  document.getElementById("showcond").innerHTML = ret ;
 }
 
 // poi will render this component in the plugin panel
 export const reactClass = (class PluginClickButton extends Component {
   render() {
-    const test = testship()
-    const fleetinfo = getfleet();
     const condshipinfo = getAllCondShip();
     return (
       <div>
-        <h1>flan is baka</h1>
         <Button onClick={reRend}>
           统计闪船
         </Button>
