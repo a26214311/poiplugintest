@@ -53,6 +53,7 @@ function getfleetmap(){
   }
   return fleetmap;
 }
+
 function getAllCondShip(){
   try{
     var ret = getAllCondShipD();
@@ -74,6 +75,17 @@ function getAllBucketsId(){
   return ret;
 }
 
+function getPage(shiplvarr,shipid){
+  var c=0;
+  for(var i=0;i<shiplvarr.length;i++){
+    if(shiplvarr[i][0]==shipid){
+      return c;
+    }
+    c++;
+  }
+  return -1;
+}
+
 
 function getAllCondShipD(){
   var fleetmap = getfleetmap();
@@ -82,11 +94,13 @@ function getAllCondShipD(){
   var bucketships = [];
   var allbucketsId = getAllBucketsId();
   var bucketret = "";
+  var shiplvarr = [];
   for (var p in allships){
     var ship = allships[p];
     var cond = ship.api_cond;
     var lv = ship.api_lv;
     var infoshipid = ship.api_ship_id;
+    shiplvarr.push([p,lv*1000+infoshipid]);
     var shiptypenamearr = getShipTypeAndName(infoshipid);
     var shiptype = shiptypenamearr[0];
     var shipname = shiptypenamearr[1];
@@ -113,13 +127,13 @@ function getAllCondShipD(){
       bucketships.push([p,lv,shipname,cond,numofbuckets]);
     }
   }
-  //console.log(condships);
+  shiplvarr.sort(function(a,b){return b[1]-a[1]});
   var ret = "";
   for (var p in condships){
     var conddetail = condships[p];
     ret = ret + p + ":" + conddetail.count + "<br>";
     var list = conddetail.list;
-    list.sort(function(a,b){return a[1]<b[1]});
+    list.sort(function(a,b){return b[1]-a[1]});
     for(var i=0;i<list.length;i++){
       var condi = list[i][3];
       var condstyle;
@@ -134,6 +148,15 @@ function getAllCondShipD(){
       if(fleetmap[list[i][0]]!=undefined){
         ret = ret + "("+fleetmap[list[i][0]]+")";
       }
+      var orderofShip = getPage(shiplvarr,list[i][0]);
+      var page = Math.floor(orderofShip/10)+1;
+      var pageorder = (orderofShip+1) % 10;
+      if(pageorder==0){
+        pageorder=10;
+      }
+      var pagestr = page + "." + pageorder;
+
+      ret = ret + "(第" +pagestr +"页)";
       ret = ret + "<br>";
     }
     ret = ret + "<br>";
@@ -141,7 +164,7 @@ function getAllCondShipD(){
 
   var bucketimg = '<img style="height:20px;" class="img-img" src="assets/img/slotitem/125.png">';
   var bucketret = "";
-  bucketships.sort(function(a,b){return a[1]<b[1]});
+  bucketships.sort(function(a,b){return b[1]-a[1]});
   for(var i=0;i<bucketships.length;i++){
     var condstyle;
     var condi = bucketships[i][3];
@@ -161,10 +184,20 @@ function getAllCondShipD(){
     if(fleetmap[bucketships[i][0]]!=undefined){
       bucketret = bucketret + "("+fleetmap[bucketships[i][0]]+")";
     }
+    var orderofShip = getPage(shiplvarr,bucketships[i][0]);
+    var page = Math.floor(orderofShip/10)+1;
+    var pageorder = (orderofShip+1) % 10;
+    if(pageorder==0){
+      pageorder=10;
+    }
+    var pagestr = page + "." + pageorder;
+
+
+    bucketret = bucketret + "(第" + pagestr +"页)";
     bucketret = bucketret + "<br>";
   }
 
-  var rret = ret + '<br>' + '桶船：<br>' + bucketret +'<br>';
+  var rret = '闪船：<br>' + ret + '<br>' + '桶船：<br>' + bucketret +'<br>';
 
   return new Date().toLocaleString() + "<br>" + rret;
 }
