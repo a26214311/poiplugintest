@@ -1,3 +1,4 @@
+import { join } from 'path'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { createSelector } from 'reselect'
@@ -51,7 +52,8 @@ export const reactClass = connect(
   render() {
     const {count, increaseClick} = this.props
     return (
-      <div>
+      <div className="test">
+        <link rel='stylesheet' href={join(__dirname, 'test.css')} />
         <h1>Clicked: {count}</h1>
         <Button onClick={increaseClick}>
           Click here!

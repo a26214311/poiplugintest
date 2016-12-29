@@ -1,0 +1,6 @@
+.test {
+	border: 5px solid #f00;
+}
+.test:after{
+	content: 'shikong is baka'
+}
