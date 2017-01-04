@@ -190,7 +190,6 @@ function getAllCondShipD(){
       var x1 = bucketships[i][4] & 7;
       var x2 = (bucketships[i][4] >> 3) & 7;
       var x3 = (bucketships[i][4] >> 6) & 7;
-      console.log(x1,x2,x3);
       for(var j=0;j<x1;j++){
         bucketret = bucketret + bucketimg;
       }
@@ -240,14 +239,36 @@ function reRend(){
 }
 
 // poi will render this component in the plugin panel
-export const reactClass = (class PluginClickButton extends Component {
+export const reactClass = connect(
+    state => ({
+      horizontal: state.config.poi.layout || 'horizontal',
+      $ships: state.const.$ships,
+      ships: state.info.ships,
+      fleets: state.info.fleets,
+      $equips: state.const.$equips,
+      equips: state.info.equips,
+    }),
+  null, null, { pure: false }
+)(class PluginClickButton extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      testinfo:"testinfo",
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    reRend();
+  }
+
+
+
+
+
   render() {
     const condshipinfo = getAllCondShip();
     return (
       <div>
-        <Button onClick={reRend}>
-          统计闪船
-        </Button>
         <div id="showcond">
         <div dangerouslySetInnerHTML={{__html: condshipinfo}}>
 
