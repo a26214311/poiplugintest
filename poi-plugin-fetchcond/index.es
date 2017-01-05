@@ -5,6 +5,8 @@ import { Button } from 'react-bootstrap'
 
 import { store } from 'views/create-store'
 
+import { join } from 'path'
+
 // Import selectors defined in poi
 import { extensionSelectorFactory } from 'views/utils/selectors'
 
@@ -224,7 +226,8 @@ export const reactClass = (class PluginClickButton extends Component {
   render() {
     const condshipinfo = getAllCondShip();
     return (
-      <div>
+      <div id="fetchcond" className="fetchcond">
+        <link rel="stylesheet" href={join(__dirname, 'fetchcond.css')} />
         <Button onClick={reRend}>
           统计闪船
         </Button>
