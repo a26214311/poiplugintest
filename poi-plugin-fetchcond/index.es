@@ -70,8 +70,8 @@ function getAllBucketsId(){
   var allEquips = getStore("info.equips");
   var ret = {};
   for(var p in allEquips){
-    if(allEquips[p].api_slotitem_id==75){
-      ret[p] = 1;
+    if(allEquips[p].api_slotitem_id==75||allEquips[p].api_slotitem_id==68||allEquips[p].api_slotitem_id==193){
+      ret[p] = allEquips[p].api_slotitem_id;
     }
   }
   return ret;
@@ -121,8 +121,16 @@ function getAllCondShipD(){
     var slots = ship.api_slot;
     var numofbuckets = 0;
     for(var i=0;i<slots.length;i++){
-      if(allbucketsId[slots[i]]==1){
-        numofbuckets ++ ;
+      if(allbucketsId[slots[i]]!=undefined){
+        var itemtype = allbucketsId[slots[i]];
+        if(itemtype==75){ //运输桶
+          numofbuckets ++ ;
+        }else if(itemtype == 68){//大发动艇
+          numofbuckets += 8;
+        }else if(itemtype == 193){//特大发动艇
+          numofbuckets += 64;
+        }
+
       }
     }
     if(numofbuckets>0){
@@ -158,13 +166,15 @@ function getAllCondShipD(){
       }
       var pagestr = page + "." + pageorder;
 
-      ret = ret + "(第" +pagestr +"页)";
+      ret = ret + "";
       ret = ret + "<br>";
     }
     ret = ret + "<br>";
   }
 
   var bucketimg = '<img style="height:20px;" class="img-img" src="assets/img/slotitem/125.png">';
+  var bucketimg2 = '<img style="height:20px;" class="img-img" src="assets/img/slotitem/120.png">';
+  var bucketimg3 = '<img style="height:20px;" class="img-img" src="assets/img/slotitem/120.png">';
   var bucketret = "";
   bucketships.sort(function(a,b){return b[1]-a[1]});
   for(var i=0;i<bucketships.length;i++){
@@ -179,8 +189,17 @@ function getAllCondShipD(){
     }
     bucketret = bucketret + "lv." + bucketships[i][1] + " "+bucketships[i][2] +'<span class="'+condstyle+'">★' + bucketships[i][3]+ "</span>";
     if(bucketships[i][4]>0){
-      for(var j=0;j<bucketships[i][4];j++){
+      var x1 = bucketships[i][4] & 7;
+      var x2 = (bucketships[i][4] >> 3) & 7;
+      var x3 = (bucketships[i][4] >> 6) & 7;
+      for(var j=0;j<x1;j++){
         bucketret = bucketret + bucketimg;
+      }
+      for(var j=0;j<x2;j++){
+        bucketret = bucketret + bucketimg2;
+      }
+      for(var j=0;j<x3;j++){
+        bucketret = bucketret + bucketimg3;
       }
     }
     if(fleetmap[bucketships[i][0]]!=undefined){
@@ -195,11 +214,11 @@ function getAllCondShipD(){
     var pagestr = page + "." + pageorder;
 
 
-    bucketret = bucketret + "(第" + pagestr +"页)";
+    bucketret = bucketret + "";
     bucketret = bucketret + "<br>";
   }
 
-  var rret = '闪船：<br>' + ret + '<br>' + '桶船：<br>' + bucketret +'<br>';
+  var rret = '闪船：<br>' + ret + '<br>' + '桶/大发船：<br>' + bucketret +'<br>';
 
   return new Date().toLocaleString() + "<br>" + rret;
 }
@@ -222,15 +241,37 @@ function reRend(){
 }
 
 // poi will render this component in the plugin panel
-export const reactClass = (class PluginClickButton extends Component {
+export const reactClass = connect(
+    state => ({
+      horizontal: state.config.poi.layout || 'horizontal',
+      $ships: state.const.$ships,
+      ships: state.info.ships,
+      fleets: state.info.fleets,
+      $equips: state.const.$equips,
+      equips: state.info.equips,
+    }),
+  null, null, { pure: false }
+)(class PluginClickButton extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      testinfo:"testinfo",
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    reRend();
+  }
+
+
+
+
+
   render() {
     const condshipinfo = getAllCondShip();
     return (
       <div id="fetchcond" className="fetchcond">
         <link rel="stylesheet" href={join(__dirname, 'fetchcond.css')} />
-        <Button onClick={reRend}>
-          统计闪船
-        </Button>
         <div id="showcond">
         <div dangerouslySetInnerHTML={{__html: condshipinfo}}>
 
