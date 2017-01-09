@@ -401,11 +401,6 @@ export const reactClass = connect(
               return(
                 <div>
                   lv.{ship[1]} {ship[2]}<span className={condstyle}>★{ship[3]}</span>
-                  <span>
-                    for(var i=0;i<x1;i++){
-                      <img style={{width:'20px'}} className="img-img" src="assets/img/slotitem/125.png"></img>
-                    }
-                  </span>
                   {
                     x1img.map(function(){
                       return(
