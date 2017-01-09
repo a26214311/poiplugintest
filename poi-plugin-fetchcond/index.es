@@ -268,17 +268,166 @@ export const reactClass = connect(
 
 
 
+  test(){
+
+    var fleetmap = this.getfleetmap();
+    var allships = this.props.ships
+    var condships = {};
+    var bucketships = [];
+    var allbucketsId = this.getAllBucketsId();
+    var bucketret = "";
+    var shiplvarr = [];
+    for (var p in allships){
+      var ship = allships[p];
+      var cond = ship.api_cond;
+      var lv = ship.api_lv;
+      var infoshipid = ship.api_ship_id;
+      shiplvarr.push([p,lv*1000+infoshipid]);
+      var shiptypenamearr = this.getShipTypeAndName(infoshipid);
+      var shiptype = shiptypenamearr[0];
+      var shipname = shiptypenamearr[1];
+      if(cond>=50){
+        if(condships[shiptype]==undefined){
+          condships[shiptype]={"count":1,list:[[p,lv,shipname,cond]]}
+        }else{
+          var oldcount = condships[shiptype].count;
+          var oldlist = condships[shiptype].list;
+          oldlist.push([p,lv,shipname,cond]);
+          var newdata = {"count":oldcount+1,list:oldlist};
+          condships[shiptype] = newdata;
+        }
+      }
+
+      var slots = ship.api_slot;
+      var numofbuckets = 0;
+      for(var i=0;i<slots.length;i++){
+        if(allbucketsId[slots[i]]!=undefined){
+          var itemtype = allbucketsId[slots[i]];
+          if(itemtype==75){ //运输桶
+            numofbuckets ++ ;
+          }else if(itemtype == 68){//大发动艇
+            numofbuckets += 8;
+          }else if(itemtype == 193){//特大发动艇
+            numofbuckets += 64;
+          }
+
+        }
+      }
+      if(numofbuckets>0){
+        bucketships.push([p,lv,shipname,cond,numofbuckets]);
+      }
+    }
+    bucketships.sort(function(a,b){return b[1]-a[1]});
+    return [fleetmap,condships,bucketships];
+  }
+
 
 
   render() {
-    const condshipinfo = this.getAllCondShip();
+    const condshipinfo = this.test();
+    const fleetmap = condshipinfo[0];
+    const condships = condshipinfo[1];
+    const bucketships = condshipinfo[2];
+    const shiptypes = Object.keys(condships);
     return (
       <div id="fetchcond" className="fetchcond">
         <link rel="stylesheet" href={join(__dirname, 'fetchcond.css')} />
         <div id="showcond">
-        <div dangerouslySetInnerHTML={{__html: condshipinfo}}>
-
-        </div>
+          {
+            shiptypes.map(function (shiptype) {
+            const conddetail = condships[shiptype];
+            const list = conddetail.list;
+            list.sort(function(a,b){return b[1]-a[1]});
+            return(
+              <div>
+                <div>{new Date().toLocaleString()}</div>
+                <div>{shiptype}:{conddetail.count}</div>
+                <div>{list.map(function(ship){
+                  const condi = ship[3];
+                  let condstyle;
+                  if(condi>=53){
+                    condstyle = "ship-cond poi-ship-cond-53 dark";
+                  }else if(condi>=50){
+                    condstyle = "ship-cond poi-ship-cond-50 dark";
+                  }else{
+                    condstyle = "ship-cond poi-ship-cond-49 dark";
+                  }
+                  let fleetstr = "";
+                  if(fleetmap[ship[0]]!=undefined){
+                    fleetstr = "("+fleetmap[ship[0]]+")";
+                  }
+                  return(
+                    <div>
+                      lv.{ship[1]} {ship[2]}<span className={condstyle}>★{ship[3]}</span>{fleetstr}
+                    </div>
+                  )
+                })}<br/></div>
+              </div>
+              )
+            })
+          }
+          <div></div>
+          <div>桶/大发船:</div>
+          {
+            bucketships.map(function(ship){
+              const condi = ship[3];
+              let condstyle;
+              if(condi>=53){
+                condstyle = "ship-cond poi-ship-cond-53 dark";
+              }else if(condi>=50){
+                condstyle = "ship-cond poi-ship-cond-50 dark";
+              }else{
+                condstyle = "ship-cond poi-ship-cond-49 dark";
+              }
+              let fleetstr = "";
+              if(fleetmap[ship[0]]!=undefined){
+                fleetstr = "("+fleetmap[ship[0]]+")";
+              }
+              let bucketret = "";
+              const x1 = ship[4] & 7;
+              const x2 = (ship[4] >> 3) & 7;
+              const x3 = (ship[4] >> 6) & 7;
+              let x1img = [];
+              let x2img = [];
+              let x3img = [];
+              for(var i=0;i<x1;i++){
+                x1img.push(1);
+              }
+              for(var i=0;i<x2;i++){
+                x2img.push(1);
+              }
+              for(var i=0;i<x3;i++){
+                x3img.push(1);
+              }
+              return(
+                <div>
+                  lv.{ship[1]} {ship[2]}<span className={condstyle}>★{ship[3]}</span>
+                  {
+                    x1img.map(function(){
+                      return(
+                        <img style={{width:20px}} className="img-img" src="assets/img/slotitem/125.png"></img>
+                      )
+                    })
+                  }
+                  {
+                    x2img.map(function(){
+                      return(
+                        <img style={{width:20px}} className="img-img" src="assets/img/slotitem/120.png"></img>
+                      )
+                    })
+                  }
+                  {
+                    x3img.map(function(){
+                      return(
+                        <img style={{width:20px}} className="img-img" src="assets/img/slotitem/120.png"></img>
+                      )
+                    })
+                  }
+                  {fleetstr}
+                </div>
+              )
+            })
+          }
         </div>
         <div></div>
       </div>
