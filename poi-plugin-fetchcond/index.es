@@ -332,6 +332,7 @@ export const reactClass = connect(
     return (
       <div id="fetchcond" className="fetchcond">
         <link rel="stylesheet" href={join(__dirname, 'fetchcond.css')} />
+        <div>{new Date().toLocaleString()}</div>
         <div id="showcond">
           {
             shiptypes.map(function (shiptype) {
@@ -340,7 +341,6 @@ export const reactClass = connect(
             list.sort(function(a,b){return b[1]-a[1]});
             return(
               <div>
-                <div>{new Date().toLocaleString()}</div>
                 <div>{shiptype}:{conddetail.count}</div>
                 <div>{list.map(function(ship){
                   const condi = ship[3];
@@ -383,7 +383,6 @@ export const reactClass = connect(
               if(fleetmap[ship[0]]!=undefined){
                 fleetstr = "("+fleetmap[ship[0]]+")";
               }
-              let bucketret = "";
               const x1 = ship[4] & 7;
               const x2 = (ship[4] >> 3) & 7;
               const x3 = (ship[4] >> 6) & 7;
@@ -402,6 +401,11 @@ export const reactClass = connect(
               return(
                 <div>
                   lv.{ship[1]} {ship[2]}<span className={condstyle}>★{ship[3]}</span>
+                  <span>
+                    for(var i=0;i<x1;i++){
+                      <img style={{width:'20px'}} className="img-img" src="assets/img/slotitem/125.png"></img>
+                    }
+                  </span>
                   {
                     x1img.map(function(){
                       return(
@@ -430,6 +434,7 @@ export const reactClass = connect(
           }
         </div>
         <div></div>
+        <div><br></br></div>
       </div>
     )
   }
