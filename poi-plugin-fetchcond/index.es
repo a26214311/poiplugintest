@@ -405,21 +405,21 @@ export const reactClass = connect(
                   {
                     x1img.map(function(){
                       return(
-                        <img style={{width:20px}} className="img-img" src="assets/img/slotitem/125.png"></img>
+                        <img style={{width:'20px'}} className="img-img" src="assets/img/slotitem/125.png"></img>
                       )
                     })
                   }
                   {
                     x2img.map(function(){
                       return(
-                        <img style={{width:20px}} className="img-img" src="assets/img/slotitem/120.png"></img>
+                        <img style={{width:'20px'}} className="img-img" src="assets/img/slotitem/120.png"></img>
                       )
                     })
                   }
                   {
                     x3img.map(function(){
                       return(
-                        <img style={{width:20px}} className="img-img" src="assets/img/slotitem/120.png"></img>
+                        <img style={{width:'20px'}} className="img-img" src="assets/img/slotitem/120.png"></img>
                       )
                     })
                   }
