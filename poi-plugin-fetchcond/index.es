@@ -114,141 +114,6 @@ export const reactClass = connect(
     return -1;
   }
 
-
-  getAllCondShipD(){
-    var fleetmap = this.getfleetmap();
-    var allships = this.props.ships
-    var condships = {};
-    var bucketships = [];
-    var allbucketsId = this.getAllBucketsId();
-    var bucketret = "";
-    var shiplvarr = [];
-    for (var p in allships){
-      var ship = allships[p];
-      var cond = ship.api_cond;
-      var lv = ship.api_lv;
-      var infoshipid = ship.api_ship_id;
-      shiplvarr.push([p,lv*1000+infoshipid]);
-      var shiptypenamearr = this.getShipTypeAndName(infoshipid);
-      var shiptype = shiptypenamearr[0];
-      var shipname = shiptypenamearr[1];
-      if(cond>=50){
-        if(condships[shiptype]==undefined){
-          condships[shiptype]={"count":1,list:[[p,lv,shipname,cond]]}
-        }else{
-          var oldcount = condships[shiptype].count;
-          var oldlist = condships[shiptype].list;
-          oldlist.push([p,lv,shipname,cond]);
-          var newdata = {"count":oldcount+1,list:oldlist};
-          condships[shiptype] = newdata;
-        }
-      }
-
-      var slots = ship.api_slot;
-      var numofbuckets = 0;
-      for(var i=0;i<slots.length;i++){
-        if(allbucketsId[slots[i]]!=undefined){
-          var itemtype = allbucketsId[slots[i]];
-          if(itemtype==75){ //运输桶
-            numofbuckets ++ ;
-          }else if(itemtype == 68){//大发动艇
-            numofbuckets += 8;
-          }else if(itemtype == 193){//特大发动艇
-            numofbuckets += 64;
-          }
-
-        }
-      }
-      if(numofbuckets>0){
-        bucketships.push([p,lv,shipname,cond,numofbuckets]);
-      }
-    }
-    shiplvarr.sort(function(a,b){return b[1]-a[1]});
-    var ret = "";
-    for (var p in condships){
-      var conddetail = condships[p];
-      ret = ret + p + ":" + conddetail.count + "<br>";
-      var list = conddetail.list;
-      list.sort(function(a,b){return b[1]-a[1]});
-      for(var i=0;i<list.length;i++){
-        var condi = list[i][3];
-        var condstyle;
-        if(condi>=53){
-          condstyle = "ship-cond poi-ship-cond-53 dark";
-        }else if(condi>=50){
-          condstyle = "ship-cond poi-ship-cond-50 dark";
-        }else{
-          condstyle = "ship-cond poi-ship-cond-49 dark";
-        }
-        ret = ret + "lv." + list[i][1] + " "+list[i][2] +'<span class="'+condstyle+'">★' + list[i][3] + "</span>";
-        if(fleetmap[list[i][0]]!=undefined){
-          ret = ret + "("+fleetmap[list[i][0]]+")";
-        }
-        var orderofShip = this.getPage(shiplvarr,list[i][0]);
-        var page = Math.floor(orderofShip/10)+1;
-        var pageorder = (orderofShip+1) % 10;
-        if(pageorder==0){
-          pageorder=10;
-        }
-        var pagestr = page + "." + pageorder;
-
-        ret = ret + "";
-        ret = ret + "<br>";
-      }
-      ret = ret + "<br>";
-    }
-
-    var bucketimg = '<img style="height:20px;" class="img-img" src="assets/img/slotitem/125.png">';
-    var bucketimg2 = '<img style="height:20px;" class="img-img" src="assets/img/slotitem/120.png">';
-    var bucketimg3 = '<img style="height:20px;" class="img-img" src="assets/img/slotitem/120.png">';
-    var bucketret = "";
-    bucketships.sort(function(a,b){return b[1]-a[1]});
-    for(var i=0;i<bucketships.length;i++){
-      var condstyle;
-      var condi = bucketships[i][3];
-      if(condi>=53){
-        condstyle = "ship-cond poi-ship-cond-53 dark";
-      }else if(condi>=50){
-        condstyle = "ship-cond poi-ship-cond-50 dark";
-      }else{
-        condstyle = "ship-cond poi-ship-cond-49 dark";
-      }
-      bucketret = bucketret + "lv." + bucketships[i][1] + " "+bucketships[i][2] +'<span class="'+condstyle+'">★' + bucketships[i][3]+ "</span>";
-      if(bucketships[i][4]>0){
-        var x1 = bucketships[i][4] & 7;
-        var x2 = (bucketships[i][4] >> 3) & 7;
-        var x3 = (bucketships[i][4] >> 6) & 7;
-        for(var j=0;j<x1;j++){
-          bucketret = bucketret + bucketimg;
-        }
-        for(var j=0;j<x2;j++){
-          bucketret = bucketret + bucketimg2;
-        }
-        for(var j=0;j<x3;j++){
-          bucketret = bucketret + bucketimg3;
-        }
-      }
-      if(fleetmap[bucketships[i][0]]!=undefined){
-        bucketret = bucketret + "("+fleetmap[bucketships[i][0]]+")";
-      }
-      var orderofShip = this.getPage(shiplvarr,bucketships[i][0]);
-      var page = Math.floor(orderofShip/10)+1;
-      var pageorder = (orderofShip+1) % 10;
-      if(pageorder==0){
-        pageorder=10;
-      }
-      var pagestr = page + "." + pageorder;
-
-
-      bucketret = bucketret + "";
-      bucketret = bucketret + "<br>";
-    }
-
-    var rret = '闪船：<br>' + ret + '<br>' + '桶/大发船：<br>' + bucketret +'<br>';
-
-    return new Date().toLocaleString() + "<br>" + rret;
-  }
-
   getShipTypeAndName(infoshipid){
     var shipinfo = this.props.$ships[infoshipid];
     if(shipinfo==undefined){
@@ -262,14 +127,11 @@ export const reactClass = connect(
   }
 
   reRend(){
-    var ret = this.getAllCondShip();
-    document.getElementById("showcond").innerHTML = ret ;
+    //var ret = this.getAllCondShip();
+    //document.getElementById("showcond").innerHTML = ret ;
   }
 
-
-
-  test(){
-
+  getAllCondShipD(){
     var fleetmap = this.getfleetmap();
     var allships = this.props.ships
     var condships = {};
@@ -321,10 +183,8 @@ export const reactClass = connect(
     return [fleetmap,condships,bucketships];
   }
 
-
-
   render() {
-    const condshipinfo = this.test();
+    const condshipinfo = this.getAllCondShip();
     const fleetmap = condshipinfo[0];
     const condships = condshipinfo[1];
     const bucketships = condshipinfo[2];
