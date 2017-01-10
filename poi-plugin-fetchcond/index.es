@@ -44,6 +44,11 @@ function increaseClick() {
   }
 }
 
+function show(x){
+  var n = x.indexOf("_");
+  var shiptype = x.substring(n+1);
+  document.getElementById("div_"+shiptype).scrollIntoView();
+}
 
 
 // poi will render this component in the plugin panel
@@ -188,7 +193,8 @@ export const reactClass = connect(
     const fleetmap = condshipinfo[0];
     const condships = condshipinfo[1];
     const bucketships = condshipinfo[2];
-    const shiptypes = Object.keys(condships);
+    let shiptypes = Object.keys(condships);
+    shiptypes.sort(function(a,b){return condships[b].count-condships[a].count});
     return (
       <div id="fetchcond" className="fetchcond">
         <link rel="stylesheet" href={join(__dirname, 'fetchcond.css')} />
@@ -196,11 +202,21 @@ export const reactClass = connect(
         <div id="showcond">
           {
             shiptypes.map(function (shiptype) {
+              const conddetail = condships[shiptype];
+              let shiptypeid = shiptype;
+              return(
+                <Button id={shiptypeid} onclick="show(this.id);">{shiptype}:{conddetail.count}</Button>
+              )
+            })
+          }
+          {
+            shiptypes.map(function (shiptype) {
             const conddetail = condships[shiptype];
             const list = conddetail.list;
             list.sort(function(a,b){return b[1]-a[1]});
+            let shiptypeid="div_"+shiptype;
             return(
-              <div>
+              <div id={shiptypeid}>
                 <div>{shiptype}:{conddetail.count}</div>
                 <div>{list.map(function(ship){
                   const condi = ship[3];
