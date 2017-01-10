@@ -45,9 +45,13 @@ function increaseClick() {
 }
 
 function show(x){
-  var n = x.indexOf("_");
-  var shiptype = x.substring(n+1);
-  document.getElementById("div_"+shiptype).scrollIntoView();
+  try{
+    console.log(x);
+    var shiptype = x;
+    document.getElementById("div_"+shiptype).scrollIntoView();
+  }catch(e){
+    console.log(e);
+  }
 }
 
 
@@ -188,6 +192,8 @@ export const reactClass = connect(
     return [fleetmap,condships,bucketships];
   }
 
+
+
   render() {
     const condshipinfo = this.getAllCondShip();
     const fleetmap = condshipinfo[0];
@@ -203,9 +209,8 @@ export const reactClass = connect(
           {
             shiptypes.map(function (shiptype) {
               const conddetail = condships[shiptype];
-              let shiptypeid = shiptype;
               return(
-                <Button id={shiptypeid} onclick="show(this.id);">{shiptype}:{conddetail.count}</Button>
+                <Button onClick={show(shiptype)}>{shiptype}:{conddetail.count}</Button>
               )
             })
           }
