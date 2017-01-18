@@ -209,8 +209,9 @@ export const reactClass = connect(
           {
             shiptypes.map(function (shiptype) {
               const conddetail = condships[shiptype];
+              let func = function(x){console.log(x)};
               return(
-                <Button onClick={show(shiptype)}>{shiptype}:{conddetail.count}</Button>
+                <Button ref={shiptype} onClick={func}>{shiptype}:{conddetail.count}</Button>
               )
             })
           }
