@@ -209,6 +209,8 @@ export const reactClass = connect(
       )
     })
 
+    console.log(this.refs.ships)
+
     return (
       <div id="fetchcond" className="fetchcond">
         <link rel="stylesheet" href={join(__dirname, 'fetchcond.css')} />
@@ -219,7 +221,7 @@ export const reactClass = connect(
               const conddetail = condships[shiptype];
               let func = function(x){console.log(x)};
               return(
-                <Button ref={shiptype} onClick={func}>{shiptype}:{conddetail.count}</Button>
+                <Button ref="ships" onClick={func}>{shiptype}:{conddetail.count}</Button>
               )
             })
           }
