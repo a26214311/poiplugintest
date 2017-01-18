@@ -184,13 +184,75 @@ export const reactClass = connect(
     return [fleetmap,condships,bucketships];
   }
 
-  show(x){
-    try{
-      console.log(x);
-      var shiptype = x;
-      document.getElementById("div_"+shiptype).scrollIntoView();
-    }catch(e){
-      console.log(e);
+  getShortShiptype(shiptype){
+    switch(shiptype)
+    {
+      case "海防艦":
+        return "海防";
+        break;
+      case "駆逐艦":
+        return "駆逐";
+        break;
+      case "軽巡洋艦":
+        return "軽巡";
+        break;
+      case "重雷装巡洋艦":
+        return "雷巡";
+        break;
+      case "重巡洋艦":
+        return "重巡";
+        break;
+      case "航空巡洋艦":
+        return "航巡";
+        break;
+      case "軽空母":
+        return "軽母";
+        break;
+      case "戦艦":
+        return "戦艦";
+        break;
+      case "航空戦艦":
+        return "航戦";
+        break;
+      case "正規空母":
+        return "空母";
+        break;
+      case "超弩級戦艦":
+        return "超弩";
+        break;
+      case "潜水艦":
+        return "潜艇";
+        break;
+      case "潜水空母":
+        return "潜母";
+        break;
+      case "補給艦":
+        return "補給";
+        break;
+      case "水上機母艦":
+        return "水母";
+        break;
+      case "揚陸艦":
+        return "揚陸艦";
+        break;
+      case "装甲空母":
+        return "装母";
+        break;
+      case "工作艦":
+        return "工作艦";
+        break;
+      case "練習巡洋艦":
+        return "練巡";
+        break;
+      case "潜水母艦":
+        return "潜水母艦";
+        break;
+      case "補給艦":
+        return "補給";
+        break;
+      default:
+        return shiptype;
+        break;
     }
   }
 
@@ -201,30 +263,43 @@ export const reactClass = connect(
     const bucketships = condshipinfo[2];
     let shiptypes = Object.keys(condships);
     shiptypes.sort(function(a,b){return condships[b].count-condships[a].count});
-
-    let ships = shiptypes.map(function (shiptype) {
-      const conddetail = condships[shiptype];
-      return(
-        <Button onClick={this.show(shiptype)}>{shiptype}:{conddetail.count}</Button>
-      )
-    })
-
-    console.log(this.refs.ships)
-
+    let scrolltodiv = function(x){
+      try{
+        console.log(x);
+        document.getElementById("div_"+x.firstshiptype).scrollIntoView();
+      }catch(e){
+        console.log(e);
+      }
+    };
+    var buttonarr=[];
+    var cc=0;
+    var shiptypebuttonstr="";
+    var firstshiptype="";
+    for(var i=0;i<shiptypes.length;i++){
+      if(cc==0){
+        firstshiptype=shiptypes[i];
+      }
+      cc=cc+condships[shiptypes[i]].count+3;
+      shiptypebuttonstr = shiptypebuttonstr + this.getShortShiptype(shiptypes[i])+":"+condships[shiptypes[i]].count+" ";
+      if(cc>20){
+        buttonarr.push(<Button onClick={scrolltodiv.bind(this,{firstshiptype})}>{shiptypebuttonstr}</Button>);
+        cc=0;
+        shiptypebuttonstr="";
+        firstshiptype="";
+      }
+    }
+    if(cc>0){
+      buttonarr.push(<Button onClick={scrolltodiv.bind(this,{firstshiptype})}>{shiptypebuttonstr}</Button>);
+    }
+    firstshiptype = "bucketship";
+    buttonarr.push(<Button onClick={scrolltodiv.bind(this,{firstshiptype})}>桶/大发船：{bucketships.length}</Button>);
     return (
       <div id="fetchcond" className="fetchcond">
         <link rel="stylesheet" href={join(__dirname, 'fetchcond.css')} />
         <div>{new Date().toLocaleString()}</div>
         <div id="showcond">
-          {
-            shiptypes.map(function (shiptype) {
-              const conddetail = condships[shiptype];
-              let func = function(x){console.log(x)};
-              return(
-                <Button ref="ships" onClick={func}>{shiptype}:{conddetail.count}</Button>
-              )
-            })
-          }
+
+          {buttonarr}
           {
             shiptypes.map(function (shiptype) {
             const conddetail = condships[shiptype];
@@ -259,7 +334,7 @@ export const reactClass = connect(
             })
           }
           <div></div>
-          <div>桶/大发船:</div>
+          <div id="div_bucketship">桶/大发船:</div>
           {
             bucketships.map(function(ship){
               const condi = ship[3];
