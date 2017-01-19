@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { createSelector } from 'reselect'
-import { Button, Row, Col, Tabs, Tab } from 'react-bootstrap'
+import { Button, Row, Col, Tabs, Tab, ListGroup, ListGroupItem } from 'react-bootstrap'
 
 import { store } from 'views/create-store'
 
@@ -290,43 +290,138 @@ export const reactClass = connect(
     firstshiptype = "bucketship";
     buttonarr.push(<Button onClick={scrolltodiv.bind(this,{firstshiptype})}>桶/大发船：{bucketships.length}</Button>);
     //shiptypes.sort(function(a,b){return condships[b].count-condships[a].count});
+    // 合并舰船种类
+
+    console.log(condships);
+
+    const shipObject = (type) => {
+      let defaultObj = {
+        count:0,
+        list:[]
+      };
+      return Object.assign(defaultObj, condships[type])
+    };
+
+    let condShipAssign = {
+      "駆逐": {
+        ships:{
+          "駆逐艦": shipObject("駆逐艦")
+        },
+        count: shipObject("駆逐艦").count
+      },
+      "軽巡": {
+        ships: {
+          "軽巡洋艦": shipObject("軽巡洋艦"),
+          "重雷装巡洋艦": shipObject("重雷装巡洋艦")
+        },
+        count: shipObject("軽巡洋艦").count + shipObject("重雷装巡洋艦").count
+      },
+      "重巡": {
+        ships: {
+          "重巡洋艦": shipObject("重巡洋艦"),
+          "航空巡洋艦": shipObject("航空巡洋艦")
+        },
+        count: shipObject("重巡洋艦").count + shipObject("航空巡洋艦").count
+      },
+      "戦艦": {
+        ships: {
+          "戦艦": shipObject("戦艦"),
+          "航空戦艦": shipObject("航空戦艦"),
+          "超弩級戦艦": shipObject("超弩級戦艦")
+        },
+        count: shipObject("戦艦").count + shipObject("航空戦艦").count + shipObject("超弩級戦艦").count
+      },
+      "空母": {
+        ships: {
+          "水上機母艦": shipObject("水上機母艦"),
+          "軽空母": shipObject("軽空母"),
+          "正規空母": shipObject("正規空母"),
+          "装甲空母": shipObject("装甲空母")
+        },
+        count: shipObject("水上機母艦").count + shipObject("軽空母").count + shipObject("正規空母").count + shipObject("装甲空母").count
+      },
+      "潜水艦": {
+        ships: {
+          "潜水艦": shipObject("潜水艦"),
+          "潜水母艦": shipObject("潜水母艦")
+        },
+        count: shipObject("潜水艦").count + shipObject("潜水母艦").count
+      },
+      "其他": {
+        ships: {
+          "揚陸艦": shipObject("揚陸艦"),
+          "工作艦": shipObject("工作艦"),
+          "補給艦": shipObject("補給艦")
+        },
+        count: shipObject("揚陸艦").count + shipObject("工作艦").count + shipObject("補給艦").count
+      }
+    };
+
+    console.log(condShipAssign);
+
+    shiptypes = ["驱逐", "轻巡", "重巡", "战舰", "空母", "潜艇", "其他"];
+
+    const mergeShip = (type) =>{
+      switch(type){
+        case "驱逐":
+          return ["駆逐艦"]
+        case "轻巡":
+          return ["軽巡洋艦", "重雷装巡洋艦"]
+        case "重巡":
+          return ["重巡洋艦", "航空巡洋艦"]
+        case "战舰":
+          return ["戦艦", "航空戦艦", "超弩級戦艦"]
+        case "空母":
+          return ["水上機母艦","軽空母","正規空母", "装甲空母"]
+        case "潜艇":
+          return ["潜水艦", "潜水母艦"]
+        default:
+          return ["揚陸艦", "工作艦", "補給艦"]
+      }
+    }
+
+
+
     return (
       <div id="fetchcond" className="fetchcond">
         <link rel="stylesheet" href={join(__dirname, 'fetchcond.css')} />
         <div>{new Date().toLocaleString()}</div>
         <div id="showcond">
-          <Tabs defaultActiveKey={1} id="ship-test">
+          <Tabs defaultActiveKey={shiptypes[0]} id="ship-type">
             {
               shiptypes.map((shiptype) => {
-                const conddetail = condships[shiptype];
-                const list = conddetail.list;
-                list.sort(function(a,b){return b[1]-a[1]});
-                let shiptypeid="div_"+shiptype;
+                let listgroup = [], types = mergeShip(shiptypes[shiptype]);
+                types.map((type) => {
+                  const conddetail = condships[type], list = conddetail ? conddetail.list : [];
+                  list.sort((a,b) => {return b[1] - a[1]});
+                  listgroup.push(<ListGroupItem>{shiptype}:{conddetail ? conddetail.count : 0}</ListGroupItem>)
+                  list.map(function(ship){
+                    const condi = ship[3];
+                    let condstyle;
+                    if(condi>=53){
+                      condstyle = "ship-cond poi-ship-cond-53 dark";
+                    }else if(condi>=50){
+                      condstyle = "ship-cond poi-ship-cond-50 dark";
+                    }else{
+                      condstyle = "ship-cond poi-ship-cond-49 dark";
+                    }
+                    let fleetstr = "";
+                    if(fleetmap[ship[0]]!=undefined){
+                      fleetstr = "("+fleetmap[ship[0]]+")";
+                    }
+                    listgroup.push(
+                      <ListGroupItem>
+                        lv.{ship[1]} {ship[2]}<span className={condstyle}>★{ship[3]}</span>{fleetstr}
+                      </ListGroupItem>
+                    )
+                  })
+                });
+
                 return(
                   <Tab eventKey={shiptype} title={this.getShortShiptype(shiptype)}>
-                    <div id={shiptypeid}>
-                      <div>{shiptype}:{conddetail.count}</div>
-                      <Row>{list.map(function(ship){
-                        const condi = ship[3];
-                        let condstyle;
-                        if(condi>=53){
-                          condstyle = "ship-cond poi-ship-cond-53 dark";
-                        }else if(condi>=50){
-                          condstyle = "ship-cond poi-ship-cond-50 dark";
-                        }else{
-                          condstyle = "ship-cond poi-ship-cond-49 dark";
-                        }
-                        let fleetstr = "";
-                        if(fleetmap[ship[0]]!=undefined){
-                          fleetstr = "("+fleetmap[ship[0]]+")";
-                        }
-                        return(
-                          <Col xs={4} className="ship-box">
-                            lv.{ship[1]} {ship[2]}<span className={condstyle}>★{ship[3]}</span>{fleetstr}
-                          </Col>
-                        )
-                      })}</Row>
-                    </div>
+                    <ListGroup>
+                      { listgroup }
+                    </ListGroup>
                   </Tab>
                 )
               })
