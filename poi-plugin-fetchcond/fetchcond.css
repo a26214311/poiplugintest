@@ -1,3 +1,8 @@
 #fetchcond {
-	margin: 0 15px;
+	margin: 0 30px;
+}
+
+#fetchcond .ship-box {
+	padding: 6px 12px;
+	border: 1px solid #454545;
 }

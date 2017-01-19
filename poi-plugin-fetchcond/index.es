@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { createSelector } from 'reselect'
-import { Button } from 'react-bootstrap'
+import { Button, Row, Col, Tabs, Tab } from 'react-bootstrap'
 
 import { store } from 'views/create-store'
 
@@ -295,6 +295,43 @@ export const reactClass = connect(
         <link rel="stylesheet" href={join(__dirname, 'fetchcond.css')} />
         <div>{new Date().toLocaleString()}</div>
         <div id="showcond">
+          <Tabs defaultActiveKey={1} id="ship-test">
+            {
+              shiptypes.map((shiptype) => {
+                const conddetail = condships[shiptype];
+                const list = conddetail.list;
+                list.sort(function(a,b){return b[1]-a[1]});
+                let shiptypeid="div_"+shiptype;
+                return(
+                  <Tab eventKey={shiptype} title={this.getShortShiptype(shiptype)}>
+                    <div id={shiptypeid}>
+                      <div>{shiptype}:{conddetail.count}</div>
+                      <Row>{list.map(function(ship){
+                        const condi = ship[3];
+                        let condstyle;
+                        if(condi>=53){
+                          condstyle = "ship-cond poi-ship-cond-53 dark";
+                        }else if(condi>=50){
+                          condstyle = "ship-cond poi-ship-cond-50 dark";
+                        }else{
+                          condstyle = "ship-cond poi-ship-cond-49 dark";
+                        }
+                        let fleetstr = "";
+                        if(fleetmap[ship[0]]!=undefined){
+                          fleetstr = "("+fleetmap[ship[0]]+")";
+                        }
+                        return(
+                          <Col xs={4} className="ship-box">
+                            lv.{ship[1]} {ship[2]}<span className={condstyle}>★{ship[3]}</span>{fleetstr}
+                          </Col>
+                        )
+                      })}</Row>
+                    </div>
+                  </Tab>
+                )
+              })
+            }
+          </Tabs>
 
           {buttonarr}
           {
@@ -306,7 +343,7 @@ export const reactClass = connect(
             return(
               <div id={shiptypeid}>
                 <div>{shiptype}:{conddetail.count}</div>
-                <div>{list.map(function(ship){
+                <Row>{list.map(function(ship){
                   const condi = ship[3];
                   let condstyle;
                   if(condi>=53){
@@ -321,11 +358,11 @@ export const reactClass = connect(
                     fleetstr = "("+fleetmap[ship[0]]+")";
                   }
                   return(
-                    <div>
+                    <Col xs={4} className="ship-box">
                       lv.{ship[1]} {ship[2]}<span className={condstyle}>★{ship[3]}</span>{fleetstr}
-                    </div>
+                    </Col>
                   )
-                })}<br/></div>
+                })}</Row>
               </div>
               )
             })
