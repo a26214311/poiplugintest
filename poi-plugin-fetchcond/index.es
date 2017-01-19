@@ -247,9 +247,6 @@ export const reactClass = connect(
       case "潜水母艦":
         return "潜水母艦";
         break;
-      case "補給艦":
-        return "補給";
-        break;
       default:
         return shiptype;
         break;
@@ -262,7 +259,6 @@ export const reactClass = connect(
     const condships = condshipinfo[1];
     const bucketships = condshipinfo[2];
     let shiptypes = Object.keys(condships);
-    shiptypes.sort(function(a,b){return condships[b].count-condships[a].count});
     let scrolltodiv = function(x){
       try{
         console.log(x);
@@ -279,9 +275,9 @@ export const reactClass = connect(
       if(cc==0){
         firstshiptype=shiptypes[i];
       }
-      cc=cc+condships[shiptypes[i]].count+3;
+      cc=cc+condships[shiptypes[i]].count+2;
       shiptypebuttonstr = shiptypebuttonstr + this.getShortShiptype(shiptypes[i])+":"+condships[shiptypes[i]].count+" ";
-      if(cc>20){
+      if(cc>25){
         buttonarr.push(<Button onClick={scrolltodiv.bind(this,{firstshiptype})}>{shiptypebuttonstr}</Button>);
         cc=0;
         shiptypebuttonstr="";
@@ -293,6 +289,7 @@ export const reactClass = connect(
     }
     firstshiptype = "bucketship";
     buttonarr.push(<Button onClick={scrolltodiv.bind(this,{firstshiptype})}>桶/大发船：{bucketships.length}</Button>);
+    //shiptypes.sort(function(a,b){return condships[b].count-condships[a].count});
     return (
       <div id="fetchcond" className="fetchcond">
         <link rel="stylesheet" href={join(__dirname, 'fetchcond.css')} />
