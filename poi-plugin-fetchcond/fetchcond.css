@@ -2,13 +2,6 @@
 	margin: 0 15px;
 }
 
-#fetchcond .update-time{
-	padding: 6px 15px;
-	margin: 0 -15px;
-	background: #454545;
-	text-align: right;
-}
-
 #fetchcond .list-group {
 	margin-top: 15px;
 }
@@ -23,4 +16,20 @@
 
 #fetchcond .list-group-item .img-items{
 	width: 30px;
+}
+
+/* test */
+#fetchcond .nav-tabs {
+	margin-top: 10px;
+}
+
+#fetchcond .nav-tabs li{
+	position: relative;
+	overflow: visible;
+}
+
+#fetchcond .nav-tabs .badge{
+	position: absolute;
+	right: 0;
+	top:-5px;
 }

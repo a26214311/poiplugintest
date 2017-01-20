@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
 import {createSelector} from 'reselect'
-import {Button, Row, Col, Tabs, Tab, ListGroup, ListGroupItem} from 'react-bootstrap'
+import {Button, Container, Row, Col, Tabs, Tab, ListGroup, ListGroupItem, Nav, NavItem, Content, Pane, NavDropdown, MenuItem} from 'react-bootstrap'
 
 import {store} from 'views/create-store'
 
@@ -234,67 +234,89 @@ export const reactClass = connect(
     return (
       <div id="fetchcond" className="fetchcond">
         <link rel="stylesheet" href={join(__dirname, 'fetchcond.css')}/>
-        <div className="update-time">{"更新时间" + new Date().toLocaleString()}</div>
         <div id="showcond">
-          <Tabs defaultActiveKey={0} id="ship-type">
-            {
-              shiptypes.map((shiptype, index) => {
-                if (shipCount[shiptype]) {
-                  let listgroup = [], types = mergeShip(shiptype);
-                  types.map((type) => {
-                    const conddetail = condships[type], list = conddetail ? conddetail.list : [];
-                    list.sort((a, b) => {
-                      return b[1] - a[1]
-                    });
-                    if (conddetail) {
-                      listgroup.push(<ListGroupItem active><span className="title-type">{type}:{conddetail ? conddetail.count : 0}</span></ListGroupItem>)
-                    }
-                    list.map((ship) => {
-                      listgroup.push(
-                        <ListGroupItem>
-                          lv.{ship[1]} {fleetmap[ship[0]] ? '(' + fleetmap[ship[0]] + ')' : ''} {ship[2]}<span className={creteMoraleClass(ship[3])}>★{ship[3]}</span>
-                        </ListGroupItem>
-                      )
+          <Tab.Container defaultActiveKey={0} id="ship-type">
+            <Row className="clearfix">
+              <Col sm={12}>
+                <Nav bsStyle="tabs">
+                  {
+                    shiptypes.map((shiptype, index) => {
+                      if(shipCount[shiptype]){
+                        return (
+                          <NavItem eventKey={index}>
+                            {[shiptype, <span className="badge">{shipCount[shiptype]}</span>]}
+                          </NavItem>
+                        )
+                      }
                     })
-                  });
-
-                  return (
-                    <Tab eventKey={index} title={shiptype + ':' + shipCount[shiptype]}>
-                      <ListGroup>
-                        { listgroup }
-                      </ListGroup>
-                    </Tab>
-                  )
-                }
-              })
-            }
-            <Tab eventKey={shiptypes.length} title="桶/大发船">
-              <ListGroup>
-                {
-                  bucketships.map(function (ship) {
-                    const x1 = ship[4] & 7;
-                    const x2 = (ship[4] >> 3) & 7;
-                    const x3 = (ship[4] >> 6) & 7;
-                    let ximg = [];
-                    for (let i = 0; i < x1; i++) {
-                      ximg.push(<img className="img-items" src="assets/img/slotitem/125.png"></img>);
-                    }
-                    for (let i = 0; i < x2; i++) {
-                      ximg.push(<img className="img-items" src="assets/img/slotitem/120.png"></img>);
-                    }
-                    for (let i = 0; i < x3; i++) {
-                      ximg.push(<img className="img-items" src="assets/img/slotitem/120.png"></img>);
-                    }
-                    return (
-                      <ListGroupItem>
-                        lv.{ship[1]} {ship[2]} {fleetmap[ship[0]] ? '(' + fleetmap[ship[0]] + ')' : ''} <span className={creteMoraleClass(ship[3])}>★{ship[3]}</span> {ximg}
-                      </ListGroupItem>
-                    )
-                  })
-                }
-              </ListGroup>
-            </Tab>
-          </Tabs>
+                  }
+                  <NavItem eventKey={shiptypes.length}>
+                    { "桶船" }
+                  </NavItem>
+                </Nav>
+              </Col>
+              <Col sm={12}>
+                <Tab.Content>
+                  {
+                    shiptypes.map((shiptype, index) => {
+                      if (shipCount[shiptype]) {
+                        let listgroup = [], types = mergeShip(shiptype);
+                        types.map((type) => {
+                          const conddetail = condships[type], list = conddetail ? conddetail.list : [];
+                          list.sort((a, b) => {
+                            return b[1] - a[1]
+                          });
+                          if (conddetail) {
+                            listgroup.push(<ListGroupItem active><span className="title-type">{type}:{conddetail ? conddetail.count : 0}</span></ListGroupItem>)
+                          }
+                          list.map((ship) => {
+                            listgroup.push(
+                              <ListGroupItem>
+                                lv.{ship[1]} {fleetmap[ship[0]] ? '(' + fleetmap[ship[0]] + ')' : ''} {ship[2]}<span className={creteMoraleClass(ship[3])}>★{ship[3]}</span>
+                              </ListGroupItem>
+                            )
+                          })
+                        });
+                        return (
+                          <Tab.Pane eventKey={index}>
+                            <ListGroup>
+                              { listgroup }
+                            </ListGroup>
+                          </Tab.Pane>
+                        )
+                      }
+                    })
+                  }
+                  <Tab.Pane eventKey={shiptypes.length}>
+                    <ListGroup>
+                      {
+                        bucketships.map(function (ship) {
+                          const x1 = ship[4] & 7;
+                          const x2 = (ship[4] >> 3) & 7;
+                          const x3 = (ship[4] >> 6) & 7;
+                          let ximg = [];
+                          for (let i = 0; i < x1; i++) {
+                            ximg.push(<img className="img-items" src="assets/img/slotitem/125.png"></img>);
+                          }
+                          for (let i = 0; i < x2; i++) {
+                            ximg.push(<img className="img-items" src="assets/img/slotitem/120.png"></img>);
+                          }
+                          for (let i = 0; i < x3; i++) {
+                            ximg.push(<img className="img-items" src="assets/img/slotitem/120.png"></img>);
+                          }
+                          return (
+                            <ListGroupItem>
+                              lv.{ship[1]} {ship[2]} {fleetmap[ship[0]] ? '(' + fleetmap[ship[0]] + ')' : ''} <span className={creteMoraleClass(ship[3])}>★{ship[3]}</span> {ximg}
+                            </ListGroupItem>
+                          )
+                        })
+                      }
+                    </ListGroup>
+                  </Tab.Pane>
+                </Tab.Content>
+              </Col>
+            </Row>
+          </Tab.Container>
         </div>
       </div>
     )
