@@ -1,15 +1,17 @@
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
 import {createSelector} from 'reselect'
-import {Button, Container, Row, Col, Tabs, Tab, ListGroup, ListGroupItem, Nav, NavItem, Content, Pane, NavDropdown, MenuItem} from 'react-bootstrap'
+import {Button, Container, Row, Col, Tabs, Tab, ListGroup, ListGroupItem,
+  Nav, NavItem, Content, Pane, NavDropdown, MenuItem,
+  FormControl} from 'react-bootstrap'
 
 import {store} from 'views/create-store'
 
 import {join} from 'path'
+import {fs} from 'fs'
 
 // Import selectors defined in poi
 import {extensionSelectorFactory} from 'views/utils/selectors'
-
 
 const EXTENSION_KEY = 'poi-plugin-fetchcond'
 
@@ -19,29 +21,6 @@ const pluginDataSelector = createSelector(
   (state) => state || {}
 )
 // This selector gets store.ext['poi-plugin-click-button'].count
-const clickCountSelector = createSelector(
-  pluginDataSelector,
-  (state) => state.count
-)
-
-// poi will insert this reducer into the root reducer of the app
-export function reducer(state = {count: 0}, action) {
-  const {type} = action
-  if (type === '@@poi-plugin-click-button@click')
-    return {
-      // don't modify the state, use Object Spread Operator
-      ...state,
-      count: (state.count || 0) + 5,
-    }
-  return state
-}
-
-// Action
-function increaseClick() {
-  return {
-    type: '@@poi-plugin-click-button@click'
-  }
-}
 
 
 // poi will render this component in the plugin panel
@@ -60,12 +39,13 @@ export const reactClass = connect(
   constructor(props) {
     super(props)
     this.state = {
-      testinfo: "testinfo",
+      "test":"testinfo",
+      notify_cond:[]
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    this.reRend();
+
   }
 
   getfleetmap() {
@@ -101,17 +81,6 @@ export const reactClass = connect(
     return ret;
   }
 
-  getPage(shiplvarr, shipid) {
-    var c = 0;
-    for (var i = 0; i < shiplvarr.length; i++) {
-      if (shiplvarr[i][0] == shipid) {
-        return c;
-      }
-      c++;
-    }
-    return -1;
-  }
-
   getShipTypeAndName(infoshipid) {
     var shipinfo = this.props.$ships[infoshipid];
     if (shipinfo == undefined) {
@@ -122,11 +91,6 @@ export const reactClass = connect(
     var shipTypeInfo = this.props.$shipTypes[shiptype];
     var shipTypeStr = shipTypeInfo.api_name;
     return [shipTypeStr, shipname];
-  }
-
-  reRend() {
-    //var ret = this.getAllCondShip();
-    //document.getElementById("showcond").innerHTML = ret ;
   }
 
   getAllCondShipD() {
@@ -156,7 +120,6 @@ export const reactClass = connect(
           condships[shiptype] = newdata;
         }
       }
-
       var slots = ship.api_slot;
       var numofbuckets = 0;
       for (var i = 0; i < slots.length; i++) {
@@ -182,12 +145,40 @@ export const reactClass = connect(
     return [fleetmap, condships, bucketships];
   }
 
+  add_notify(){
+    var anc_hour = document.getElementById("anc_hour").value;
+    var anc_minute = document.getElementById("anc_minute").value;
+    var anc_shiptype = document.getElementById("anc_shiptype").value;
+    var anc_compare = document.getElementById("anc_compare").value;
+    var anc_number = document.getElementById("anc_number").value;
+    console.log(anc_hour,anc_minute,anc_shiptype,anc_compare,anc_number);
+    var nownc = this.state.notify_cond;
+    console.log(nownc);
+    nownc.push([anc_hour,anc_minute,anc_shiptype,anc_compare,anc_number]);
+    fs.writeFileSync(join(window.APPDATA_PATH, 'cond_config','test.json'), nownc);
+    this.setState(nownc);
+  }
+
   render() {
     const condshipinfo = this.getAllCondShip();
     const fleetmap = condshipinfo[0];
     const condships = condshipinfo[1];
     const bucketships = condshipinfo[2];
+    const allShipTypes = this.props.$shipTypes;
+    const allShipTypeId = Object.keys(allShipTypes);
 
+    let hours = [];
+    let minutes = [];
+    let numbers = [];
+    for(var i=0;i<24;i++){
+      hours.push(i);
+    }
+    for(var i=0;i<60;i++){
+      minutes.push(i);
+    }
+    for(var i=0;i<30;i++){
+      numbers.push(i);
+    }
     // 合并舰船种类
     let shiptypes = ["驱逐", "轻巡", "重巡", "战舰", "空母", "潜艇", "其他"];
     const mergeShip = (type) => {
@@ -230,7 +221,6 @@ export const reactClass = connect(
       });
       shipCount[shiptype] = count;
     });
-
     return (
       <div id="fetchcond" className="fetchcond">
         <link rel="stylesheet" href={join(__dirname, 'fetchcond.css')}/>
@@ -318,7 +308,123 @@ export const reactClass = connect(
             </Row>
           </Tab.Container>
         </div>
+        <div id="show_notify_cond" style={{display:"none"}}>
+        </div>
+        <div id="add_notify_cond" style={{display:"none"}}>
+          <FormControl id="anc_hour" style={{width:"35px",display:'inline','text-align':'center'}} componentClass="select">
+            {hours.map(function(e){
+              return(
+                <option value={e}>{e}</option>
+              )
+            })}
+          </FormControl>:
+          <FormControl id="anc_minute" style={{width:"35px",display:'inline','text-align':'center'}} componentClass="select">
+            {minutes.map(function(e){
+              return(
+                <option value={e}>{e}</option>
+              )
+            })}
+          </FormControl>
+          <span dangerouslySetInnerHTML={{__html: "&nbsp&nbsp&nbsp"}}>
+          </span>
+          <FormControl id="anc_shiptype" style={{width:"50px",display:'inline'}} componentClass="select">
+            {
+              allShipTypeId.map(function(ashiptype){
+                let getShortShiptype = function(shiptype){
+                  switch(shiptype)
+                  {
+                    case "海防艦":
+                      return "海防";
+                      break;
+                    case "駆逐艦":
+                      return "駆逐";
+                      break;
+                    case "軽巡洋艦":
+                      return "軽巡";
+                      break;
+                    case "重雷装巡洋艦":
+                      return "雷巡";
+                      break;
+                    case "重巡洋艦":
+                      return "重巡";
+                      break;
+                    case "航空巡洋艦":
+                      return "航巡";
+                      break;
+                    case "軽空母":
+                      return "軽母";
+                      break;
+                    case "戦艦":
+                      return "戦艦";
+                      break;
+                    case "航空戦艦":
+                      return "航戦";
+                      break;
+                    case "正規空母":
+                      return "空母";
+                      break;
+                    case "超弩級戦艦":
+                      return "超弩";
+                      break;
+                    case "潜水艦":
+                      return "潜艇";
+                      break;
+                    case "潜水空母":
+                      return "潜母";
+                      break;
+                    case "補給艦":
+                      return "補給";
+                      break;
+                    case "水上機母艦":
+                      return "水母";
+                      break;
+                    case "揚陸艦":
+                      return "揚陸艦";
+                      break;
+                    case "装甲空母":
+                      return "装母";
+                      break;
+                    case "工作艦":
+                      return "工作艦";
+                      break;
+                    case "練習巡洋艦":
+                      return "練巡";
+                      break;
+                    case "潜水母艦":
+                      return "潜水母艦";
+                      break;
+                    default:
+                      return shiptype;
+                      break;
+                  }
+                }
+                let shiptypeobj = allShipTypes[ashiptype];
+                let shotshiptype = getShortShiptype(shiptypeobj.api_name);
+                return(
+                  <option value={shiptypeobj.api_name}>
+                    {shotshiptype}
+                  </option>
+                )
+              })
+            }
+          </FormControl>
+          <FormControl id="anc_compare" style={{width:"50px",display:'inline','text-align':'center'}} componentClass="select">
+            <option value="小于" key="小于">小于</option>
+            <option value="大于" key="大于">大于</option>
+          </FormControl>
+          <FormControl id="anc_number" style={{width:"35px",display:'inline','text-align':'center'}} componentClass="select">
+            {numbers.map(function(e){
+              return(
+                <option value={e}>{e}</option>
+              )
+            })}
+          </FormControl>
+
+          <Button onClick={this.add_notify.bind(this)}>添加提醒</Button>
+        </div>
       </div>
     )
+
+
   }
 });
