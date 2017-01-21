@@ -8,22 +8,21 @@ import {Button, Container, Row, Col, Tabs, Tab, ListGroup, ListGroupItem,
 import {store} from 'views/create-store'
 
 import {join} from 'path'
-import {fs} from 'fs'
 
 // Import selectors defined in poi
 import {extensionSelectorFactory} from 'views/utils/selectors'
 
 const EXTENSION_KEY = 'poi-plugin-fetchcond'
-
+const fs = require('fs');
 // This selector gets store.ext['poi-plugin-click-button']
 const pluginDataSelector = createSelector(
   extensionSelectorFactory(EXTENSION_KEY),
   (state) => state || {}
 )
-// This selector gets store.ext['poi-plugin-click-button'].count
 
 
-// poi will render this component in the plugin panel
+
+
 export const reactClass = connect(
   state => ({
     horizontal: state.config.poi.layout || 'horizontal',
@@ -40,7 +39,8 @@ export const reactClass = connect(
     super(props)
     this.state = {
       "test":"testinfo",
-      notify_cond:[]
+      notify_cond:[],
+      needload:true
     }
   }
 
@@ -151,12 +151,30 @@ export const reactClass = connect(
     var anc_shiptype = document.getElementById("anc_shiptype").value;
     var anc_compare = document.getElementById("anc_compare").value;
     var anc_number = document.getElementById("anc_number").value;
+    var anc_daily = document.getElementById("anc_daily").value;
     console.log(anc_hour,anc_minute,anc_shiptype,anc_compare,anc_number);
     var nownc = this.state.notify_cond;
-    console.log(nownc);
-    nownc.push([anc_hour,anc_minute,anc_shiptype,anc_compare,anc_number]);
-    fs.writeFileSync(join(window.APPDATA_PATH, 'cond_config','test.json'), nownc);
-    this.setState(nownc);
+    nownc.push([anc_hour,anc_minute,anc_shiptype,anc_compare,anc_number,anc_daily]);
+    var savepath = join(window.APPDATA_PATH, 'cond_config','cond_notify.json');
+    fs.writeFileSync(savepath, JSON.stringify(nownc));
+  }
+
+  load_notify(){
+    var needload = this.state.needload;
+    if(needload){
+      var savedpath = join(window.APPDATA_PATH, 'cond_config','cond_notify.json');
+      try{
+        var datastr = fs.readFileSync(savedpath,'utf-8');
+        var nownc = eval("(" + datastr + ")");
+        this.setState({notify_cond:nownc,needload:false});
+        return nownc;
+      }catch(e){
+        console.log(e);
+        return [];
+      }
+    }else{
+      return this.state.notify_cond;
+    }
   }
 
   render() {
@@ -166,7 +184,8 @@ export const reactClass = connect(
     const bucketships = condshipinfo[2];
     const allShipTypes = this.props.$shipTypes;
     const allShipTypeId = Object.keys(allShipTypes);
-
+    let nownc = this.load_notify();
+    console.log('nownc:'+nownc);
     let hours = [];
     let minutes = [];
     let numbers = [];
@@ -308,16 +327,82 @@ export const reactClass = connect(
             </Row>
           </Tab.Container>
         </div>
-        <div id="show_notify_cond" style={{display:"none"}}>
+        <div id="show_notify_cond" style={{display:""}}>
+          {
+            nownc.map(function(anotify){
+              let dailystr;
+              switch(anotify[5]) {
+                case "0":
+                  dailystr = "每天";
+                  break;
+                case "1":
+                  dailystr = "周一";
+                  break;
+                case "2":
+                  dailystr = "周二";
+                  break;
+                case "3":
+                  dailystr = "周三";
+                  break;
+                case "4":
+                  dailystr = "周四";
+                  break;
+                case "5":
+                  dailystr = "周五";
+                  break;
+                case "6":
+                  dailystr = "周六";
+                  break;
+                case "7":
+                  dailystr = "周日";
+                  break;
+              }
+              return(
+                <div>
+                  <span style={{width:"50px"}}>{dailystr}</span>
+                  <span dangerouslySetInnerHTML={{__html: "&nbsp&nbsp&nbsp"}}>
+                  </span>
+                  <span style={{width:"35px"}}>{anotify[0]}</span>:
+                  <span style={{width:"35px"}}>{anotify[1]}</span>
+                  <span dangerouslySetInnerHTML={{__html: "&nbsp&nbsp&nbsp"}}>
+                  </span>
+                  <span style={{width:"50px"}}>{anotify[2]}</span>
+                  <span dangerouslySetInnerHTML={{__html: "&nbsp&nbsp&nbsp"}}>
+                  </span>
+                  <span style={{width:"50px"}}>{anotify[3]}</span>
+                  <span dangerouslySetInnerHTML={{__html: "&nbsp&nbsp&nbsp"}}>
+                  </span>
+                  <span style={{width:"35px"}}>{anotify[4]}</span>
+                  <span dangerouslySetInnerHTML={{__html: "&nbsp&nbsp&nbsp"}}>
+                  </span>
+                  <Button>删除提醒</Button>
+                </div>
+              )
+            })
+          }
         </div>
-        <div id="add_notify_cond" style={{display:"none"}}>
+        <div id="add_notify_cond" style={{display:""}}>
+          <FormControl id="anc_daily" style={{width:"50px",display:'inline','text-align':'center'}} componentClass="select">
+            <option value="0">每天</option>
+            <option value="1">周一</option>
+            <option value="2">周二</option>
+            <option value="3">周三</option>
+            <option value="4">周四</option>
+            <option value="5">周五</option>
+            <option value="6">周六</option>
+            <option value="7">周日</option>
+          </FormControl>
+          <span dangerouslySetInnerHTML={{__html: "&nbsp&nbsp&nbsp"}}>
+          </span>
           <FormControl id="anc_hour" style={{width:"35px",display:'inline','text-align':'center'}} componentClass="select">
             {hours.map(function(e){
               return(
                 <option value={e}>{e}</option>
               )
             })}
-          </FormControl>:
+          </FormControl>
+          <span dangerouslySetInnerHTML={{__html: "&nbsp:&nbsp"}}>
+          </span>
           <FormControl id="anc_minute" style={{width:"35px",display:'inline','text-align':'center'}} componentClass="select">
             {minutes.map(function(e){
               return(
@@ -408,10 +493,14 @@ export const reactClass = connect(
               })
             }
           </FormControl>
+          <span dangerouslySetInnerHTML={{__html: "&nbsp&nbsp&nbsp"}}>
+          </span>
           <FormControl id="anc_compare" style={{width:"50px",display:'inline','text-align':'center'}} componentClass="select">
             <option value="小于" key="小于">小于</option>
             <option value="大于" key="大于">大于</option>
           </FormControl>
+          <span dangerouslySetInnerHTML={{__html: "&nbsp&nbsp&nbsp"}}>
+          </span>
           <FormControl id="anc_number" style={{width:"35px",display:'inline','text-align':'center'}} componentClass="select">
             {numbers.map(function(e){
               return(
@@ -419,7 +508,6 @@ export const reactClass = connect(
               )
             })}
           </FormControl>
-
           <Button onClick={this.add_notify.bind(this)}>添加提醒</Button>
         </div>
       </div>
