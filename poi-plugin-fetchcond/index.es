@@ -1,9 +1,7 @@
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
 import {createSelector} from 'reselect'
-import {Button, Container, Row, Col, Tabs, Tab, ListGroup, ListGroupItem,
-  Nav, NavItem, Content, Pane, NavDropdown, MenuItem,
-  FormControl} from 'react-bootstrap'
+import {Button, Container, Row, Col, Tabs, Tab, ListGroup, ListGroupItem, Nav, NavItem, Content, Pane} from 'react-bootstrap'
 
 import {store} from 'views/create-store'
 
