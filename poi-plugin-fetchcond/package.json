@@ -1,6 +1,6 @@
 {
   "name": "poi-plugin-fetchcond",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "main": "index.es",
   "description": "A plugin for poi fetch cond ships",
   "author": {
@@ -8,7 +8,7 @@
     "url": "https://github.com/a26214311"
   },
   "poiPlugin": {
-    "title": "cond calculate",
+    "title": "闪船统计",
     "description": "baka baka baka",
     "icon": "fa/language",
     "i18nDir": "i18n/translator",
