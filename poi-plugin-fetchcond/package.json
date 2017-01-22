@@ -10,7 +10,7 @@
   "poiPlugin": {
     "title": "闪船统计",
     "description": "baka baka baka",
-    "icon": "fa/language",
+    "icon": "fa/star",
     "i18nDir": "i18n/translator",
     "apiVer": {
       "6.3.3": "2.1.1",
