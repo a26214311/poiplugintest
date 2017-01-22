@@ -28,6 +28,10 @@
 	overflow: visible;
 }
 
+#fetchcond .nav-tabs li a{
+	padding: 10px 0;
+}
+
 #fetchcond .nav-tabs .badge{
 	position: absolute;
 	right: 0;
