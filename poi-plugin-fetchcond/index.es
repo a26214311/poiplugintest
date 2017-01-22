@@ -260,7 +260,7 @@ export const reactClass = connect(
                     })
                   }
                   <NavItem eventKey={shiptypes.length}>
-                    { "桶船" }
+                    {["桶船", <span className="badge">{bucketships.length}</span>]}
                   </NavItem>
                 </Nav>
               </Col>

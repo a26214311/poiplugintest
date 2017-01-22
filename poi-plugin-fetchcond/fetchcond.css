@@ -32,6 +32,10 @@
 	padding: 10px 0;
 }
 
+#fetchcond .nav-tabs li a .badge{
+	background-color: rgba(217, 83, 79, .9);
+}
+
 #fetchcond .nav-tabs .badge{
 	position: absolute;
 	right: 0;
