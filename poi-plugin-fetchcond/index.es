@@ -198,9 +198,11 @@ export const reactClass = connect(
       numbers.push(i);
     }
     // 合并舰船种类
-    let shiptypes = ["驱逐", "轻巡", "重巡", "战舰", "空母", "潜艇", "其他"];
+    let shiptypes = ["全部", "驱逐", "轻巡", "重巡", "战舰", "空母", "潜艇", "其他"];
     const mergeShip = (type) => {
       switch (type) {
+        case "全部":
+          return ["駆逐艦", "軽巡洋艦", "重雷装巡洋艦", "重巡洋艦", "航空巡洋艦", "戦艦", "航空戦艦", "超弩級戦艦", "水上機母艦", "軽空母", "正規空母", "装甲空母", "潜水艦", "潜水空母", "揚陸艦", "工作艦", "補給艦", "練習巡洋艦", "潜水母艦"];
         case "驱逐":
           return ["駆逐艦"];
         case "轻巡":
@@ -214,7 +216,7 @@ export const reactClass = connect(
         case "潜艇":
           return ["潜水艦", "潜水空母"];
         default:
-          return ["揚陸艦", "工作艦", "補給艦", "潜水母艦"];
+          return ["揚陸艦", "工作艦", "補給艦", "練習巡洋艦", "潜水母艦"];
       }
     };
 
