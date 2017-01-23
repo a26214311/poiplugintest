@@ -7,19 +7,14 @@ import {store} from 'views/create-store'
 
 import {join} from 'path'
 
-// Import selectors defined in poi
 import {extensionSelectorFactory} from 'views/utils/selectors'
 
-const EXTENSION_KEY = 'poi-plugin-fetchcond'
-const fs = require('fs');
-// This selector gets store.ext['poi-plugin-click-button']
+const EXTENSION_KEY = 'poi-plugin-fetchcond';
+
 const pluginDataSelector = createSelector(
   extensionSelectorFactory(EXTENSION_KEY),
   (state) => state || {}
 )
-
-
-
 
 export const reactClass = connect(
   state => ({
@@ -29,22 +24,10 @@ export const reactClass = connect(
     fleets: state.info.fleets,
     $equips: state.const.$equips,
     equips: state.info.equips,
-    $shipTypes: state.const.$shipTypes,
+    $shipTypes: state.const.$shipTypes
   }),
   null, null, {pure: false}
-)(class PluginClickButton extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      "test":"testinfo",
-      notify_cond:[],
-      needload:true
-    }
-  }
-
-  componentWillReceiveProps(nextProps) {
-
-  }
+)(class PluginFetchCond extends Component {
 
   getfleetmap() {
     var fleetarr = this.props.fleets;
@@ -52,7 +35,7 @@ export const reactClass = connect(
     for (var i = 0; i < fleetarr.length; i++) {
       var nships = fleetarr[i].api_ship;
       for (var j = 0; j < nships.length; j++) {
-        fleetmap[nships[j]] = "第" + (i + 1) + "艦隊";
+        fleetmap[nships[j]] = i + 1;
       }
     }
     return fleetmap;
@@ -93,7 +76,7 @@ export const reactClass = connect(
 
   getAllCondShipD() {
     var fleetmap = this.getfleetmap();
-    var allships = this.props.ships
+    var allships = this.props.ships;
     var condships = {};
     var bucketships = [];
     var allbucketsId = this.getAllBucketsId();
@@ -143,58 +126,11 @@ export const reactClass = connect(
     return [fleetmap, condships, bucketships];
   }
 
-  add_notify(){
-    var anc_hour = document.getElementById("anc_hour").value;
-    var anc_minute = document.getElementById("anc_minute").value;
-    var anc_shiptype = document.getElementById("anc_shiptype").value;
-    var anc_compare = document.getElementById("anc_compare").value;
-    var anc_number = document.getElementById("anc_number").value;
-    var anc_daily = document.getElementById("anc_daily").value;
-    console.log(anc_hour,anc_minute,anc_shiptype,anc_compare,anc_number);
-    var nownc = this.state.notify_cond;
-    nownc.push([anc_hour,anc_minute,anc_shiptype,anc_compare,anc_number,anc_daily]);
-    var savepath = join(window.APPDATA_PATH, 'cond_config','cond_notify.json');
-    fs.writeFileSync(savepath, JSON.stringify(nownc));
-  }
-
-  load_notify(){
-    var needload = this.state.needload;
-    if(needload){
-      var savedpath = join(window.APPDATA_PATH, 'cond_config','cond_notify.json');
-      try{
-        var datastr = fs.readFileSync(savedpath,'utf-8');
-        var nownc = eval("(" + datastr + ")");
-        this.setState({notify_cond:nownc,needload:false});
-        return nownc;
-      }catch(e){
-        console.log(e);
-        return [];
-      }
-    }else{
-      return this.state.notify_cond;
-    }
-  }
-
   render() {
     const condshipinfo = this.getAllCondShip();
     const fleetmap = condshipinfo[0];
     const condships = condshipinfo[1];
     const bucketships = condshipinfo[2];
-    const allShipTypes = this.props.$shipTypes;
-    const allShipTypeId = Object.keys(allShipTypes);
-    //let nownc = this.load_notify();
-    let hours = [];
-    let minutes = [];
-    let numbers = [];
-    for(var i=0;i<24;i++){
-      hours.push(i);
-    }
-    for(var i=0;i<60;i++){
-      minutes.push(i);
-    }
-    for(var i=0;i<30;i++){
-      numbers.push(i);
-    }
     // 合并舰船种类
     let shiptypes = ["全部", "驱逐", "轻巡", "重巡", "战舰", "空母", "潜艇", "其他"];
     const mergeShip = (type) => {
@@ -239,6 +175,20 @@ export const reactClass = connect(
       });
       shipCount[shiptype] = count;
     });
+
+    // 获取舰队位置
+    const getFleet = (ship) => {
+      let fleet = fleetmap[ship], fleetStyle = 'fleet-group';
+      if(fleet){
+        fleetStyle += ' group-' + fleet;
+        return(
+          <span className={fleetStyle}>
+            {"第" + fleet + "艦隊"}
+          </span>
+        )
+      }
+    };
+
     return (
       <div id="fetchcond" className="fetchcond">
         <link rel="stylesheet" href={join(__dirname, 'fetchcond.css')}/>
@@ -263,7 +213,7 @@ export const reactClass = connect(
                   </NavItem>
                 </Nav>
               </Col>
-              <Col sm={12}>
+              <Col sm={12} className="list-container">
                 <Tab.Content>
                   {
                     shiptypes.map((shiptype, index) => {
@@ -275,12 +225,18 @@ export const reactClass = connect(
                             return b[1] - a[1]
                           });
                           if (conddetail) {
-                            listgroup.push(<ListGroupItem active><span className="title-type">{type}:{conddetail ? conddetail.count : 0}</span></ListGroupItem>)
+                            listgroup.push(
+                              <ListGroupItem active>
+                                <span className="title-type">
+                                  {[type, <span className="badge">{conddetail ? conddetail.count : 0}</span>]}
+                                </span>
+                              </ListGroupItem>
+                            )
                           }
                           list.map((ship) => {
                             listgroup.push(
                               <ListGroupItem>
-                                lv.{ship[1]} {fleetmap[ship[0]] ? '(' + fleetmap[ship[0]] + ')' : ''} {ship[2]}<span className={creteMoraleClass(ship[3])}>★{ship[3]}</span>
+                                lv.{ship[1]} {getFleet(ship[0])} {ship[2]}<span className={creteMoraleClass(ship[3])}>★{ship[3]}</span>
                               </ListGroupItem>
                             )
                           })
@@ -314,7 +270,7 @@ export const reactClass = connect(
                           }
                           return (
                             <ListGroupItem>
-                              lv.{ship[1]} {ship[2]} {fleetmap[ship[0]] ? '(' + fleetmap[ship[0]] + ')' : ''} <span className={creteMoraleClass(ship[3])}>★{ship[3]}</span> {ximg}
+                              lv.{ship[1]} {ship[2]} {getFleet(ship[0])} <span className={creteMoraleClass(ship[3])}>★{ship[3]}</span> {ximg}
                             </ListGroupItem>
                           )
                         })
