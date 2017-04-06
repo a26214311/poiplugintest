@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
 import {createSelector} from 'reselect'
-import {Button, Container, Row, Col, Tabs, Tab, ListGroup, ListGroupItem, Nav, NavItem, Content, Pane} from 'react-bootstrap'
+import { Container, Row, Col, Tabs, Tab, ListGroup, ListGroupItem, Nav, NavItem, Content, Pane} from 'react-bootstrap'
 
 import {store} from 'views/create-store'
 
@@ -284,7 +284,5 @@ export const reactClass = connect(
         </div>
       </div>
     )
-
-
   }
 });
