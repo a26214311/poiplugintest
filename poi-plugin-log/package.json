@@ -1,0 +1,20 @@
+{
+  "name": "poi-plugin-log",
+  "version": "1.0.0",
+  "main": "index.es",
+  "description": "A plugin for log only",
+  "author": {
+    "name": "a26214311",
+    "url": "https://github.com/a26214311"
+  },
+  "poiPlugin": {
+    "title": "请求日志",
+    "description": "请求日志",
+    "icon": "fa/ellipsis-h",
+    "i18nDir": "i18n/translator",
+    "apiVer": {
+      "6.3.3": "2.1.1",
+      "7.0.0-beta.1": "3.0.0"
+    }
+  }
+}
