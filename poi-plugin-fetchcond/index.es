@@ -150,7 +150,7 @@ export const reactClass = connect(
         case "潜艇":
           return ["潜水艦", "潜水空母"];
         default:
-          return ["揚陸艦", "工作艦", "補給艦", "練習巡洋艦", "潜水母艦"];
+          return ["揚陸艦", "工作艦", "補給艦", "練習巡洋艦", "潜水母艦","海防艦"];
       }
     };
 
