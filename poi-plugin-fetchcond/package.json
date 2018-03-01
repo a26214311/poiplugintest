@@ -1,6 +1,6 @@
 {
   "name": "poi-plugin-fetchcond",
-  "version": "0.1.6",
+  "version": "0.2.1",
   "main": "index.es",
   "description": "A plugin for poi fetch cond ships",
   "author": {
@@ -9,7 +9,7 @@
   },
   "poiPlugin": {
     "title": "闪船统计",
-    "description": "baka baka baka",
+    "description": "fetch cond ships",
     "icon": "fa/star",
     "i18nDir": "i18n/translator",
     "apiVer": {
